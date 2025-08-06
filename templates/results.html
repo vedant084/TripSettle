@@ -1,0 +1,238 @@
+{% extends "base.html" %}
+
+{% block title %}Settlement Results - {{ group.name }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2>
+                        <i class="fas fa-chart-line me-2 text-success"></i>
+                        Settlement Results
+                    </h2>
+                    <p class="text-muted mb-0">{{ group.name }}</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="{{ url_for('export_settlement', group_id=group.id) }}" 
+                       class="btn btn-outline-primary" target="_blank">
+                        <i class="fas fa-download me-1"></i>Export JSON
+                    </a>
+                    <a href="{{ url_for('view_group', group_id=group.id) }}" 
+                       class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>Back to Group
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Statistics -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-success bg-opacity-10 border-success">
+                <div class="card-body">
+                    <h5 class="card-title text-success">
+                        <i class="fas fa-trophy me-2"></i>
+                        Optimization Results
+                    </h5>
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h3 class="text-success mb-1">{{ summary.optimized_transactions }}</h3>
+                                <small class="text-muted">Optimized Transactions</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h3 class="text-muted mb-1">{{ summary.max_possible_transactions }}</h3>
+                                <small class="text-muted">Max Possible</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h3 class="text-primary mb-1">{{ summary.savings }}</h3>
+                                <small class="text-muted">Transactions Saved</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h3 class="text-warning mb-1">{{ summary.efficiency_percentage }}%</h3>
+                                <small class="text-muted">Efficiency</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Individual Balances -->
+        <div class="col-lg-4 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-balance-scale me-2"></i>
+                        Net Balances
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% for person_balance in balance_data %}
+                        <div class="d-flex justify-content-between align-items-center mb-3 p-2 rounded
+                            {% if person_balance.status == 'owes' %}bg-danger bg-opacity-10
+                            {% elif person_balance.status == 'owed' %}bg-success bg-opacity-10
+                            {% else %}bg-secondary bg-opacity-10{% endif %}">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-user me-2 
+                                    {% if person_balance.status == 'owes' %}text-danger
+                                    {% elif person_balance.status == 'owed' %}text-success
+                                    {% else %}text-secondary{% endif %}"></i>
+                                <span class="fw-medium">{{ person_balance.name }}</span>
+                            </div>
+                            <div class="text-end">
+                                {% if person_balance.status == 'owes' %}
+                                    <span class="text-danger fw-bold">-₹{{ "%.2f"|format(abs(person_balance.balance)) }}</span>
+                                    <br><small class="text-muted">owes money</small>
+                                {% elif person_balance.status == 'owed' %}
+                                    <span class="text-success fw-bold">+₹{{ "%.2f"|format(person_balance.balance) }}</span>
+                                    <br><small class="text-muted">gets money</small>
+                                {% else %}
+                                    <span class="text-secondary fw-bold">₹0.00</span>
+                                    <br><small class="text-muted">settled</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                    
+                    <hr>
+                    <div class="text-center">
+                        <strong>Total Amount: ₹{{ "%.2f"|format(summary.total_amount_involved) }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Optimized Transactions -->
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-exchange-alt me-2"></i>
+                        Optimized Transaction Plan
+                    </h5>
+                    {% if transactions %}
+                        <span class="badge bg-success">{{ transactions|length }} transactions needed</span>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    {% if transactions %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>How to settle:</strong> Execute these {{ transactions|length }} transactions 
+                            to completely settle all debts with minimum transfers.
+                        </div>
+
+                        {% for transaction in transactions %}
+                            <div class="card mb-3 border-start border-5 border-primary">
+                                <div class="card-body py-3">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-1">
+                                            <div class="text-center">
+                                                <span class="badge bg-primary rounded-pill">{{ transaction.step }}</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <div class="d-flex align-items-center">
+                                                <span class="fw-medium text-danger">{{ transaction.from_person }}</span>
+                                                <i class="fas fa-arrow-right mx-3 text-muted"></i>
+                                                <span class="fw-medium text-success">{{ transaction.to_person }}</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 text-end">
+                                            <h5 class="mb-0 text-primary">₹{{ "%.2f"|format(transaction.amount) }}</h5>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+
+                        <div class="alert alert-success mt-4">
+                            <i class="fas fa-check-circle me-2"></i>
+                            <strong>After these transactions, all debts will be settled!</strong>
+                        </div>
+
+                    {% else %}
+                        <div class="text-center text-muted py-5">
+                            <i class="fas fa-handshake fa-3x mb-3"></i>
+                            <h5>No transactions needed!</h5>
+                            <p class="mb-0">All balances are already settled.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Algorithm Explanation -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card border-info">
+                <div class="card-header bg-info bg-opacity-10">
+                    <h5 class="mb-0 text-info">
+                        <i class="fas fa-brain me-2"></i>
+                        How the Algorithm Works
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-calculator me-2"></i>Step 1: Calculate Net Balances</h6>
+                            <p class="text-muted mb-3">
+                                For each person, we calculate: (money they're owed) - (money they owe) = net balance
+                            </p>
+
+                            <h6><i class="fas fa-project-diagram me-2"></i>Step 2: Graph Theory Model</h6>
+                            <p class="text-muted mb-3">
+                                Model debts as a directed graph where people are nodes and debts are weighted edges
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-sort-amount-down me-2"></i>Step 3: Min-Heap Optimization</h6>
+                            <p class="text-muted mb-3">
+                                Use priority queues to always match the person who owes most with the person owed most
+                            </p>
+
+                            <h6><i class="fas fa-trophy me-2"></i>Step 4: Greedy Settlement</h6>
+                            <p class="text-muted mb-3">
+                                Greedily settle maximum possible amounts to minimize total transaction count
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Add some smooth animations
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animate transaction cards
+        const transactionCards = document.querySelectorAll('.card.mb-3.border-start');
+        transactionCards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateX(-20px)';
+            setTimeout(() => {
+                card.style.transition = 'all 0.5s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateX(0)';
+            }, index * 100);
+        });
+    });
+</script>
+{% endblock %}

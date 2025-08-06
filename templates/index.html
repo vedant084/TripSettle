@@ -1,0 +1,304 @@
+{% extends "base.html" %}
+
+{% block title %}
+{% if group %}{{ group.name }} - Cash Flow Minimizer{% else %}Cash Flow Minimizer{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    {% if not group %}
+        <!-- Landing page - show existing groups or create new -->
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="text-center mb-5">
+                    <h1 class="display-4 mb-3">
+                        <i class="fas fa-calculator text-primary me-3"></i>
+                        Cash Flow Minimizer
+                    </h1>
+                    <p class="lead text-muted">
+                        Optimize shared expenses using graph theory algorithms. 
+                        Minimize the number of transactions needed to settle group debts.
+                    </p>
+                </div>
+
+                <!-- Create new group -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-plus-circle me-2"></i>
+                            Create New Expense Group
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="{{ url_for('create_group') }}">
+                            <div class="row g-3">
+                                <div class="col-md-8">
+                                    <input type="text" class="form-control" name="group_name" 
+                                           placeholder="Enter group name (e.g., 'Trip to Goa', 'Office Lunch')" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="fas fa-plus me-1"></i>Create Group
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Existing groups -->
+                {% if groups %}
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-list me-2"></i>
+                                Existing Groups
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group list-group-flush">
+                                {% for existing_group in groups %}
+                                    <a href="{{ url_for('view_group', group_id=existing_group.id) }}" 
+                                       class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1">{{ existing_group.name }}</h6>
+                                            <small class="text-muted">
+                                                Created {{ existing_group.created_at.strftime('%B %d, %Y') }}
+                                            </small>
+                                        </div>
+                                        <i class="fas fa-chevron-right text-muted"></i>
+                                    </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+    {% else %}
+        <!-- Group management page -->
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h2>{{ group.name }}</h2>
+                        <p class="text-muted mb-0">
+                            <i class="fas fa-calendar-alt me-1"></i>
+                            Created {{ group.created_at.strftime('%B %d, %Y') }}
+                        </p>
+                    </div>
+                    {% if expenses %}
+                        <a href="{{ url_for('calculate_settlement', group_id=group.id) }}" 
+                           class="btn btn-success">
+                            <i class="fas fa-calculator me-1"></i>
+                            Calculate Settlement
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- People Management -->
+            <div class="col-lg-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-users me-2"></i>
+                            People in Group
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Add person form -->
+                        <form method="POST" action="{{ url_for('add_person', group_id=group.id) }}" class="mb-3">
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="person_name" 
+                                       placeholder="Enter person's name" required>
+                                <button type="submit" class="btn btn-outline-primary">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- People list -->
+                        {% if people %}
+                            <div class="list-group list-group-flush">
+                                {% for person in people %}
+                                    <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                        <span>
+                                            <i class="fas fa-user me-2 text-muted"></i>
+                                            {{ person.name }}
+                                        </span>
+                                        <a href="{{ url_for('delete_person', person_id=person.id) }}" 
+                                           class="btn btn-sm btn-outline-danger"
+                                           onclick="return confirm('Are you sure you want to remove {{ person.name }}?')">
+                                            <i class="fas fa-times"></i>
+                                        </a>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="text-center text-muted py-3">
+                                <i class="fas fa-user-plus fa-2x mb-2"></i>
+                                <p class="mb-0">No people added yet</p>
+                                <small>Add people to start tracking expenses</small>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Expense Management -->
+            <div class="col-lg-8">
+                <!-- Add expense form -->
+                {% if people %}
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-plus-circle me-2"></i>
+                                Add New Expense
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST" action="{{ url_for('add_expense', group_id=group.id) }}">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="description" class="form-label">Description</label>
+                                        <input type="text" class="form-control" id="description" name="description" 
+                                               placeholder="e.g., Dinner at restaurant" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="amount" class="form-label">Amount (₹)</label>
+                                        <input type="number" class="form-control" id="amount" name="amount" 
+                                               step="0.01" min="0.01" placeholder="0.00" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="payer_id" class="form-label">Who Paid?</label>
+                                        <select class="form-select" id="payer_id" name="payer_id" required>
+                                            <option value="">Select payer...</option>
+                                            {% for person in people %}
+                                                <option value="{{ person.id }}">{{ person.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Participants</label>
+                                        <div class="border rounded p-2" style="max-height: 120px; overflow-y: auto;">
+                                            {% for person in people %}
+                                                <div class="form-check">
+                                                    <input class="form-check-input participant-checkbox" type="checkbox" 
+                                                           name="participants" value="{{ person.id }}" id="participant_{{ person.id }}">
+                                                    <label class="form-check-label" for="participant_{{ person.id }}">
+                                                        {{ person.name }}
+                                                    </label>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                        <small class="form-text text-muted">Select who benefited from this expense</small>
+                                    </div>
+                                    <div class="col-12">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-plus me-1"></i>Add Expense
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- Expenses list -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-receipt me-2"></i>
+                            Expenses
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% if expenses %}
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Description</th>
+                                            <th>Amount</th>
+                                            <th>Paid By</th>
+                                            <th>Participants</th>
+                                            <th>Per Person</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for expense in expenses %}
+                                            <tr>
+                                                <td>{{ expense.description }}</td>
+                                                <td>₹{{ "%.2f"|format(expense.amount) }}</td>
+                                                <td>
+                                                    <span class="badge bg-primary">{{ expense.payer.name }}</span>
+                                                </td>
+                                                <td>
+                                                    {% for participant_id in expense.participants %}
+                                                        {% for person in people %}
+                                                            {% if person.id == participant_id %}
+                                                                <span class="badge bg-secondary me-1">{{ person.name }}</span>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    {% endfor %}
+                                                </td>
+                                                <td>₹{{ "%.2f"|format(expense.amount_per_person) }}</td>
+                                                <td>
+                                                    <a href="{{ url_for('delete_expense', expense_id=expense.id) }}" 
+                                                       class="btn btn-sm btn-outline-danger"
+                                                       onclick="return confirm('Are you sure you want to delete this expense?')">
+                                                        <i class="fas fa-trash"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="text-center text-muted py-4">
+                                <i class="fas fa-receipt fa-3x mb-3"></i>
+                                <h5>No expenses added yet</h5>
+                                {% if people %}
+                                    <p class="mb-0">Add your first expense above to get started!</p>
+                                {% else %}
+                                    <p class="mb-0">Add some people first, then start tracking expenses</p>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Auto-select payer as participant when changed
+    document.getElementById('payer_id')?.addEventListener('change', function() {
+        const payerId = this.value;
+        if (payerId) {
+            const participantCheckbox = document.getElementById('participant_' + payerId);
+            if (participantCheckbox) {
+                participantCheckbox.checked = true;
+            }
+        }
+    });
+
+    // Ensure at least one participant is selected
+    document.querySelector('form[action*="add_expense"]')?.addEventListener('submit', function(e) {
+        const checkboxes = document.querySelectorAll('.participant-checkbox:checked');
+        if (checkboxes.length === 0) {
+            e.preventDefault();
+            alert('Please select at least one participant for this expense.');
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,295 @@
+/* Cash Flow Minimizer - Custom Styles */
+
+/* Use CSS custom properties for consistent theming */
+:root {
+    --primary-color: var(--bs-primary);
+    --success-color: var(--bs-success);
+    --danger-color: var(--bs-danger);
+    --warning-color: var(--bs-warning);
+    --info-color: var(--bs-info);
+}
+
+/* Global styles */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    line-height: 1.6;
+}
+
+/* Custom card hover effects */
+.card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* List group enhancements */
+.list-group-item-action:hover {
+    background-color: var(--bs-list-group-hover-bg);
+    border-color: var(--bs-list-group-border-color);
+}
+
+/* Button enhancements */
+.btn {
+    border-radius: 0.375rem;
+    font-weight: 500;
+    transition: all 0.15s ease-in-out;
+}
+
+.btn-primary {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+}
+
+.btn-primary:hover {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+    transform: translateY(-1px);
+}
+
+/* Form enhancements */
+.form-control, .form-select {
+    border-radius: 0.375rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-control:focus, .form-select:focus {
+    box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.25);
+}
+
+/* Badge customizations */
+.badge {
+    font-weight: 500;
+    letter-spacing: 0.025em;
+}
+
+/* Alert customizations */
+.alert {
+    border-radius: 0.5rem;
+    border: none;
+}
+
+/* Table enhancements */
+.table-hover tbody tr:hover {
+    background-color: var(--bs-table-hover-bg);
+}
+
+/* Navigation enhancements */
+.navbar-brand {
+    font-weight: 600;
+    font-size: 1.25rem;
+}
+
+/* Custom spacing utilities */
+.py-7 {
+    padding-top: 5rem !important;
+    padding-bottom: 5rem !important;
+}
+
+/* Balance status indicators */
+.balance-positive {
+    color: var(--bs-success) !important;
+}
+
+.balance-negative {
+    color: var(--bs-danger) !important;
+}
+
+.balance-zero {
+    color: var(--bs-secondary) !important;
+}
+
+/* Transaction flow styling */
+.transaction-flow {
+    position: relative;
+    padding: 1rem;
+    border-left: 3px solid var(--bs-primary);
+    margin-bottom: 1rem;
+    background: var(--bs-light);
+    border-radius: 0 0.375rem 0.375rem 0;
+}
+
+.transaction-arrow {
+    font-size: 1.2rem;
+    color: var(--bs-secondary);
+    margin: 0 0.5rem;
+}
+
+/* Responsive design enhancements */
+@media (max-width: 768px) {
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    
+    .btn-group-vertical .btn {
+        margin-bottom: 0.25rem;
+    }
+    
+    .table-responsive {
+        border: none;
+    }
+    
+    .card-header h5 {
+        font-size: 1rem;
+    }
+}
+
+/* Animation utilities */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.slide-in-left {
+    animation: slideInLeft 0.5s ease-out;
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Loading states */
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.loading {
+    position: relative;
+    overflow: hidden;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+/* Toast container positioning */
+.toast-container {
+    z-index: 1055;
+}
+
+/* Form validation styling */
+.was-validated .form-control:invalid {
+    border-color: var(--bs-danger);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath d='m5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+}
+
+.was-validated .form-control:valid {
+    border-color: var(--bs-success);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23198754' d='m2.3 6.73.94-.94 1.53 1.53 3.16-3.16L8.8 5 3.28 10.53z'/%3e%3c/svg%3e");
+}
+
+/* Expense split info styling */
+#expense-split-info {
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        max-height: 0;
+        padding: 0;
+    }
+    to {
+        opacity: 1;
+        max-height: 100px;
+        padding: 0.75rem 1rem;
+    }
+}
+
+/* Dark mode specific adjustments */
+[data-bs-theme="dark"] .transaction-flow {
+    background: var(--bs-dark);
+    border-left-color: var(--bs-primary);
+}
+
+[data-bs-theme="dark"] .card:hover {
+    box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
+}
+
+/* Print styles */
+@media print {
+    .navbar,
+    .btn,
+    .alert-dismissible .btn-close,
+    footer {
+        display: none !important;
+    }
+    
+    .card {
+        border: 1px solid #000 !important;
+        box-shadow: none !important;
+    }
+    
+    .container {
+        max-width: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+}
+
+/* Accessibility improvements */
+.btn:focus,
+.form-control:focus,
+.form-select:focus {
+    outline: 2px solid var(--bs-primary);
+    outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .btn-outline-primary {
+        border-width: 2px;
+    }
+    
+    .card {
+        border-width: 2px;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
