@@ -10,7 +10,6 @@ Preferred communication style: Simple, everyday language.
 
 ## Web Framework
 - **Flask**: Lightweight Python web framework chosen for its simplicity and rapid development capabilities
-- **Jinja2 Templates**: Server-side rendering with template inheritance for consistent UI across pages
 - **Bootstrap 5**: Frontend CSS framework with dark theme for responsive design and modern UI components
 
 ## Database Layer
@@ -50,24 +49,12 @@ Preferred communication style: Simple, everyday language.
 
 ## Python Packages
 - **Flask**: Web framework and core functionality
-- **Flask-SQLAlchemy**: Database ORM integration
-- **Werkzeug**: WSGI utilities and middleware
 - **SQLAlchemy**: Database abstraction layer
 
 ## Frontend Libraries
-- **Bootstrap 5**: CSS framework loaded from Replit CDN with dark theme
-- **Font Awesome 6**: Icon library loaded from CloudFlare CDN
+- **Bootstrap 5**: CSS framework loaded from Replit CDN with dark themeN
 - **Bootstrap JavaScript**: Component functionality for modals, alerts, and tooltips
 
 ## Database
 - **SQLite**: Default file-based database for development
-- **PostgreSQL**: Configurable via DATABASE_URL environment variable for production
 
-## Development Tools
-- **Python Logging**: Built-in logging module for debugging and monitoring
-- **Flask Debug Mode**: Development server with auto-reload and enhanced error pages
-
-## Deployment Considerations
-- **Environment Variables**: DATABASE_URL for production database configuration
-- **Session Security**: SESSION_SECRET for production session management
-- **WSGI Compatibility**: Standard WSGI application structure for various deployment options
