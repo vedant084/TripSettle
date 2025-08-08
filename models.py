@@ -2,6 +2,7 @@ from app import db
 from datetime import datetime
 import json
 
+
 class ExpenseGroup(db.Model):
     """Represents a group of expenses for settlement calculation"""
     id = db.Column(db.Integer, primary_key=True)
