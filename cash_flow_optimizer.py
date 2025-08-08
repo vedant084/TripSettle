@@ -7,6 +7,7 @@ class CashFlowOptimizer:
     Optimizes cash flow using graph theory and min-heap algorithms
     to minimize the number of transactions needed to settle debts.
     """
+
     
     def __init__(self):
         self.logger = logging.getLogger(__name__)
