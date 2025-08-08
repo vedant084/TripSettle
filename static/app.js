@@ -210,3 +210,4 @@ function downloadSettlementData(groupId) {
             showToast('Error downloading settlement data', 'danger');
         });
 }
+
