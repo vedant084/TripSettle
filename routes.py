@@ -4,6 +4,7 @@ from models import ExpenseGroup, Person, Expense
 from cash_flow_optimizer import CashFlowOptimizer
 import json
 
+
 @app.route('/')
 def index():
     """Main page - show existing groups or create new one"""
